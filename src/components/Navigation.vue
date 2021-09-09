@@ -13,9 +13,10 @@
           <router-link v-if="admin" class="link" :to="{ name: 'CreatePost' }">Create Post</router-link>
           <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Login/Register</router-link>
         </ul>
-        <div v-if="user" @click="toggleProfileMenu"  class="profile" ref="profile">
+        <div v-show="!mobile" v-if="user" @click="toggleProfileMenu"  class="profile" ref="profile">
           <span>{{ this.$store.state.profileInitials }}</span>
           <div v-show="profileMenu" class="profile-menu">
+            <span></span>
             <div class="info">
               <p class="initials">{{ this.$store.state.profileInitials }}</p>
               <div class="right">
@@ -196,6 +197,15 @@ header {
           width: 250px;
           background-color: #303030;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+          span {
+            position: absolute;
+            right: 10px;
+            top: -10px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #303030;
+          }
 
           .info {
             display: flex;
