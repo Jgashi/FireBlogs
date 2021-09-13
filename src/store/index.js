@@ -131,6 +131,7 @@ export default new Vuex.Store({
       const database = db.collection('blogPosts').orderBy("date", "desc");
       const dbResults = await database.get();
       dbResults.forEach((doc) => {
+        //Determines whether the specified callback function returns true for any element of an array.
         if (!state.blogPosts.some((post) => post.blogID === doc.id)) {
           const data = {
             blogID: doc.data().blogID,

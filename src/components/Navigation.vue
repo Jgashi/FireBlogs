@@ -83,6 +83,7 @@ export default {
       windowWidth: null,
     };
   },
+  //Add eventListener before the template is rendered into html
   created() {
     window.addEventListener('resize', this.checkScreem);
     this.checkScreem();

@@ -2,16 +2,20 @@
   <div class="modal">
     <div class="modal-content">
       <p>{{this.modalMessage}}</p>
+      <button v-if="acceptButton" @click="accept">accept</button>
       <button @click="closeModal">Close</button>
     </div>
   </div>
 </template>
 <script>
 export default {
-  props: ["modalMessage"],
+  props: ["modalMessage","acceptButton"],
   methods: {
     closeModal() {
       this.$emit("close-modal");
+    },
+    accept() {
+      this.$emit("accept");
     }
   },
 }
@@ -27,6 +31,7 @@ export default {
   width: 100%;
   height: 100vh;
   top: 0;
+  left: 0;
   background-color: rgba(0, 0, 0, .7);
 
   .modal-content {

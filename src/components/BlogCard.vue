@@ -4,7 +4,7 @@
       <div class="icon" @click="editBlog">
         <Edit class="edit" />
       </div>
-      <div class="icon" @click="deletePost">
+      <div class="icon" @click="openModal">
         <Delete class="delete" />
       </div>
     </div>
@@ -12,7 +12,7 @@
     <div class="info">
       <h4>{{post.blogTitle}}</h4>
       <h6>Posted On: {{ new Date(post.blogDate).toLocaleString("en-us", { dateStyle: "long"})}}</h6>
-      <router-link class="link"  :to="{name:'ViewBlog', params: {blogid: this.post.blogID}}">
+      <router-link class="link"  :to="{ name:'ViewBlog', params: { blogid: this.post.blogID } }">
         View The Post <Arrow class="arrow"/>
       </router-link>
     </div>
@@ -32,12 +32,15 @@ export default {
     Delete
   },
   methods: {
-    deletePost() {
-      this.$store.dispatch("deletePost", this.post.blogID);
+    openModal() {
+      const blogTitle = this.post.blogTitle;
+      const blogPostId = this.post.blogID;
+      this.$emit('open-modal', [blogTitle, blogPostId]);
     },
     editBlog() {
+      //Navigate route to named route including dynamic paths
       this.$router.push({name: 'EditBlog', params: { blogid: this.post.blogID }})
-    }
+    },
   },
   computed: {
     editPost() {
@@ -68,7 +71,7 @@ export default {
       position: absolute;
       top: 10px;
       right: 10px;
-      z-index: 99;
+      z-index: 10;
 
       .icon {
         display: flex;
@@ -78,7 +81,7 @@ export default {
         height: 35px;
         border-radius: 50%;
         background-color: #fff;
-        transition: 1s ease all;
+        transition: .5s ease all;
 
         &:hover {
           background-color: #303030;

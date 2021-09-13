@@ -1,22 +1,50 @@
 <template>
-  <div class="blog-card-wrap">
+  <div class="blog-card-wrap" >
+    <Modal v-show="modalActive" :modalMessage="modalMessage" :acceptButton="acceptButton" @accept="deletePost" @close-modal="closeModal" />
     <div class="blog-cards container">
       <div class="toggle-edit">
         <span>Toggle Editing Post</span>
         <input type="checkbox" v-model="editPost">
       </div>
-      <BlogCard :post="post" v-for="(post, index) in sampleBlogCards" :key="index" />
+      <BlogCard :post="post" v-for="(post, index) in blogPosts" :key="index" @open-modal="openModal"/>
     </div>
   </div>
 </template>
 
 <script>
 import BlogCard from "../components/BlogCard.vue";
+import Modal from "../components/Modal.vue";
 export default {
   name: "blogs",
-  components: { BlogCard },
+  components: { BlogCard, Modal },
+  data() {
+    return {
+      modalActive: null,
+      modalMessage: "",
+      blogPostId: "",
+      acceptButton: true,
+    }
+  },
+  methods: {
+    deletePost() {
+      //Delete named route including dynamic paths
+      this.$store.dispatch("deletePost", this.blogPostId);
+      this.modalActive = !this.modalActive;
+      this.modalMessage = "";
+      this.blogPostId = "";
+    },
+    openModal(val) {
+      this.modalMessage = `Do you really want to delete ${val[0]}?`
+      this.modalActive = true;
+      this.blogPostId = val[1];
+    },
+    closeModal() {
+      this.modalActive = !this.modalActive;
+      this.modalMessage = "";
+    },
+  },
   computed: {
-    sampleBlogCards() {
+    blogPosts() {
       return this.$store.state.blogPosts;
     },
     editPost: {
@@ -24,12 +52,12 @@ export default {
         return this.$store.editPost
       },
       set(payload) {
-        this.$store.commit("toggleEditPost", payload)
+        this.$store.commit("toggleEditPost", payload);
       }
     }
   },
   beforeDestroy() {
-    this.$store.commit("toggleEditPost", false)
+    this.$store.commit("toggleEditPost", false);
   }
 }
 </script>

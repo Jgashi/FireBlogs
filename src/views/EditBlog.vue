@@ -1,29 +1,31 @@
 <template>
-  <div class="create-post">
-    <BlogCoverPreview v-show="this.$store.state.blogPhotoPreview" />
-    <Loading v-show="loading"/>
-    <div class="container">
-      <div :class="{invisible: !error}" class="err-message">
-        <p><span>Error:</span>{{ this.errorMsg }}</p>
-      </div>
-      <div class="blog-info">
-        <input type="text" placeholder="Enter Blog Title" v-model="blogTitle">
-        <div class="upload-file">
-          <label for="blog-photo">Upload Cover Photo</label>
-          <input type="file" ref="blogPhoto" id="blog-photo" @change="fileChange" accept=".png, .jpg, jpeg">
-          <button class="preview" @click="openPreview" :class="{ 'button-inactive': !this.$store.state.blogPhotoFileURL }">Preview Photo</button>
-          <span>File Chosen: {{ this.$store.state.blogPhotoName }}</span>
+  <keep-alive>
+    <div class="create-post">
+      <BlogCoverPreview v-show="this.$store.state.blogPhotoPreview" />
+      <Loading v-show="loading"/>
+      <div class="container">
+        <div :class="{invisible: !error}" class="err-message">
+          <p><span>Error:</span>{{ this.errorMsg }}</p>
+        </div>
+        <div class="blog-info">
+          <input type="text" placeholder="Enter Blog Title" v-model="blogTitle">
+          <div class="upload-file">
+            <label for="blog-photo">Upload Cover Photo</label>
+            <input type="file" ref="blogPhoto" id="blog-photo" @change="fileChange" accept=".png, .jpg, jpeg">
+            <button class="preview" @click="openPreview" :class="{ 'button-inactive': !this.$store.state.blogPhotoFileURL }">Preview Photo</button>
+            <span>File Chosen: {{ this.$store.state.blogPhotoName }}</span>
+          </div>
+        </div>
+        <div class="enditor">
+          <vue-editor :editorOptions="editorSettings" v-model="blogHTML" useCustomImageHandler @image-added="imageHandler" />
+        </div>
+        <div class="blog-actions">
+          <button @click="updateBlog">Save Change</button>
+          <router-link class="router-button" :to="{name : 'BlogPreview'}">Post Changes</router-link>
         </div>
       </div>
-      <div class="enditor">
-        <vue-editor :editorOptions="editorSettings" v-model="blogHTML" useCustomImageHandler @image-added="imageHandler" />
-      </div>
-      <div class="blog-actions">
-        <button @click="updateBlog">Save Change</button>
-        <router-link class="router-button" :to="{name : 'BlogPreview'}">Post Changes</router-link>
-      </div>
     </div>
-  </div>
+  </keep-alive>
 </template>
 
 <script>
@@ -58,10 +60,12 @@ export default {
     Loading
   },
   async mounted() {
+    //Get routeID from dynamic path
     this.routeID = this.$route.params.blogid;
     this.currentBlog = await this.$store.state.blogPosts.filter((post) => {
       return post.blogID === this.routeID;
     });
+    //Becouse currentBlog is an array, we only need data in array[0] to set store state and data rerender
     this.$store.commit('setBlogState', this.currentBlog[0]);
   },
   methods: {
@@ -101,15 +105,20 @@ export default {
         if (this.file) {
           this.loading = true;
           const storageRef = firebase.storage().ref();
-          const docRef = storageRef.child(`documents/BlogCoverPhotos/${this.$store.state.blogPhotoName}`);
+          const docRef = storageRef.child(`documents/blogCoverPhotos/${this.$store.state.blogPhotoName}`);
           docRef.put(this.file).on(
             "state_changed",
-            (snapshot) => {
-              console.log(snapshot);
+            () => {
+              // console.log(snapshot);
             },
             (err) => {
-              console.log(err);
+              this.error = true;
+              this.errorMsg = err.message;
               this.loading = false;
+              setTimeout(() => {
+                this.error = false;
+              }, 5000);
+              return
             }, 
             async () => {
               const downloadURL = await docRef.getDownloadURL();
@@ -118,7 +127,9 @@ export default {
                 blogCoverPhoto: downloadURL,
                 blogCoverPhotoName: this.blogCoverPhotoName,
                 blogTitle: this.blogTitle
+                //Don't need update blogId, profileId and date
               });
+              //After edmit post, reorganize the list in Blog and get blogPosts
               await this.$store.dispatch("updatePost", this.routeID);
               this.loading = false;
               this.$router.push({ name: "ViewBlog",params: { blogid : dataBase.id} });
@@ -127,6 +138,7 @@ export default {
           return;
         }
         this.loading = true;
+        //if coverPhoto did't change
         await dataBase.update({
           blogHTML: this.blogHTML,
           blogTitle: this.blogTitle,

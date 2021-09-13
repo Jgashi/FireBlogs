@@ -57,7 +57,7 @@ export default {
   },
   components: {
     BlogCoverPreview,
-    Loading
+    Loading,
   },
   methods: {
     fileChange() {
@@ -79,14 +79,20 @@ export default {
       const docRef = storageRef.child(`documents/blogPostPhotos/${file.name}`)
       docRef.put(file).on(
         "state_changed",
-        (snapshot) => {
-          console.log(snapshot);
+        () => {
         },
         (err) => {
-          console.log(err);
-        },
+          this.error = true;
+          this.errorMsg = err.message;
+          this.loading = false;
+          setTimeout(() => {
+            this.error = false;
+          }, 5000);
+          return
+        }, 
         async () => {
           const downloadURL = await docRef.getDownloadURL();
+          //Insert the acquired picture URL into the mouse back to look back
           Editor.insertEmbed(cursorLocation,"image", downloadURL);
           resetUploader();
         }
@@ -94,19 +100,25 @@ export default {
     },
 
     uploadBlog() {
-      if (this.blogTitle.length !== 0 && this.blogHTML.length !== 0) {
+      if ((this.blogTitle.length !== 0) && (this.blogHTML.length !== 0)) {
         if (this.file) {
           this.loading = true;
           const storageRef = firebase.storage().ref();
-          const docRef = storageRef.child(`documents/BlogCoverPhotos/${this.$store.state.blogPhotoName}`);
+          const docRef = storageRef.child(`documents/blogCoverPhotos/${this.$store.state.blogPhotoName}`);
+          //Completion observer, called on successful completion
           docRef.put(this.file).on(
             "state_changed",
-            (snapshot) => {
-              console.log(snapshot);
+            () => {
+              // console.log(snapshot);
             },
             (err) => {
-              console.log(err);
+              this.error = true;
+              this.errorMsg = err.message;
               this.loading = false;
+              setTimeout(() => {
+                this.error = false;
+              }, 5000);
+              return
             }, 
             async () => {
               const downloadURL = await docRef.getDownloadURL();
@@ -134,7 +146,8 @@ export default {
         setTimeout(() => {
           this.error = false;
         }, 5000);
-      } 
+        return;
+      }
       this.error = true;
       this.errorMsg = "Please ensure Blog Title & Blog Post has been filled!";
       setTimeout(() => {
@@ -171,6 +184,7 @@ export default {
 
 <style lang="scss">
 .create-post {
+  position: relative;
   height: 100%;
   button {
     margin-top: 0;
@@ -314,7 +328,7 @@ export default {
     }
 
     .ql-editor {
-      padding: 10px 16px 30px;
+      padding: 20px 16px 30px;
     }
   }
 

@@ -102,6 +102,7 @@ const routes = [
     }
   },
   {
+    //Dynamic path parameters start with a colon
     path: "/view-blog/:blogid",
     name: "ViewBlog",
     component: ViewBlog,
