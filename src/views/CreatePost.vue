@@ -20,7 +20,7 @@
       </div>
       <div class="blog-actions">
         <button @click="uploadBlog">Publish Blog</button>
-        <router-link class="router-button" :to="{name : 'BlogPreview'}">Post Preview</router-link>
+        <router-link class="router-button" :to="{ name : 'BlogPreview' }">Post Preview</router-link>
       </div>
     </div>
   </div>
@@ -31,11 +31,14 @@ import firebase from "firebase/app";
 import "firebase/storage";
 import db from "../firebase/firebaseInit";
 import BlogCoverPreview from '../components/BlogCoverPreview.vue'
-import Quill from "quill";
 import Loading from '../components/Loading.vue';
+import Quill from "quill";
 window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
+import { ImageDrop } from 'quill-image-drop-module'
+//Register the custom modules with Quill
 Quill.register("modules/imageResize", ImageResize);
+Quill.register("modules/imageDrop", ImageDrop);
 export default {
   name: "CreatePost",
   data() {
@@ -46,6 +49,7 @@ export default {
       loading: null,
       editorSettings: {
         modules: {
+          imageDrop: true,
           imageResize: {},
         }
       }
@@ -68,7 +72,10 @@ export default {
     },
 
     imageHandler(file, Editor, cursorLocation, resetUploader) {
+      //Get a reference to the storage service, which is used to create references in your storage bucket
       const storageRef = firebase.storage().ref();
+      //Create a storage reference from our storage service
+      //You can use the child() method on existing references to create references to lower levels in the tree.
       const docRef = storageRef.child(`documents/blogPostPhotos/${file.name}`)
       docRef.put(file).on(
         "state_changed",
@@ -76,11 +83,11 @@ export default {
           console.log(snapshot);
         },
         (err) => {
-          console.log(err)
+          console.log(err);
         },
         async () => {
           const downloadURL = await docRef.getDownloadURL();
-          Editor.insertEmbed(cursorLocation, "image", downloadURL);
+          Editor.insertEmbed(cursorLocation,"image", downloadURL);
           resetUploader();
         }
       );
@@ -104,6 +111,7 @@ export default {
             async () => {
               const downloadURL = await docRef.getDownloadURL();
               const timestamp = await Date.now();
+              //Use an unique ID for the returned DocumentReference(文檔參考)
               const dataBase = await db.collection("blogPosts").doc();
               await dataBase.set({
                 blogID: dataBase.id,
@@ -222,10 +230,17 @@ export default {
 
   .blog-info {
     display: flex;
-    margin-bottom: 32px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    @media (min-width: 900px) {
+      margin-bottom: 32px;
+    }
 
     input:nth-child(1) {
-      min-width: 300px;
+      min-width: 250px;
+      @media (min-width: 900px) {
+        min-width: 300px;
+      }
     }
 
     input {
@@ -242,32 +257,48 @@ export default {
 
     .upload-file {
       flex: 1;
-      margin-left: 16px;
       position: relative;
       display: flex;
-
+      flex-wrap: wrap;
+      label {
+        margin-top: 16px;
+        flex: 0 2 auto;
+        @media (min-width: 900px) {
+          margin-left: 16px;
+          margin-top: 0;
+        }
+      }
       input {
         display: none;
       }
 
       .preview {
-        margin-left: 16px;
         text-transform: initial;
+        margin-top: 16px;
+        flex: 0 1 auto;
+        @media (min-width: 900px) {
+          margin-left: 16px;
+          margin-top: unset;
+        }
       }
 
       span {
         font-size: 12px;
-        margin-left: 16px;
+        flex: 0 1 auto;
         align-self: center;
+        margin-top: 16px;
+        @media (min-width: 900px) {
+          margin-left: 16px;
+          margin-top: unset;
+        }
       }
     }  
   }
 
   .enditor {
-    height: 60vh;
+    height: 80vh;
     display: flex;
     flex-direction: column;
-
     .quillWrapper {
       position: relative;
       display: flex;
@@ -289,9 +320,14 @@ export default {
 
   .blog-actions {
     margin-top: 32px;
+    display: flex;
 
     button {
       margin-right: 16px;
+    }
+
+    .router-button {
+      margin-top: 0;
     }
   }
 }

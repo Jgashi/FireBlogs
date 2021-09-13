@@ -13,7 +13,7 @@
           <router-link v-if="admin" class="link" :to="{ name: 'CreatePost' }">Create Post</router-link>
           <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Login/Register</router-link>
         </ul>
-        <div v-show="!mobile" v-if="user" @click="toggleProfileMenu"  class="profile" ref="profile">
+        <div :class="{ 'mobile-user-menu': mobile }" v-if="user" @click="toggleProfileMenu"  class="profile" ref="profile">
           <span>{{ this.$store.state.profileInitials }}</span>
           <div v-show="profileMenu" class="profile-menu">
             <span></span>
@@ -53,7 +53,7 @@
         <router-link class="link" :to="{ name: 'Home' }"
 >Home</router-link>
         <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
-        <router-link v-if="admin" class="link" :to="{ name: 'CreatePost' }">>Create Post</router-link>
+        <router-link v-if="admin" class="link" :to="{ name: 'CreatePost' }">Create Post</router-link>
         <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Login/Register</router-link>
       </ul>
     </transition>
@@ -265,6 +265,10 @@ header {
             }
           }
         }
+      }
+
+      .mobile-user-menu {
+        margin-right: 40px;
       }
     }
   }

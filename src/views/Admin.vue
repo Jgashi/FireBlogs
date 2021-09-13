@@ -27,6 +27,7 @@ export default {
   },
   methods: {
     async addAdmin() {
+      //Get the name of function witch just create on fireBase funciton library called 'addAdminRole'
       const addAdmin = await firebase.functions().httpsCallable('addAdminRole');
       const result = await addAdmin({email: this.adminEmail});
       this.functionMsg = result.data.message;

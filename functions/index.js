@@ -7,6 +7,7 @@ exports.addAdminRole = functions.https.onCall((data) => {
     .auth()
     .getUserByEmail(data.email)
     .then((user) => {
+      //設定用戶自訂義聲明，並將admin設為true
       return admin.auth().setCustomUserClaims(user.uid, {
         admin: true,
       })

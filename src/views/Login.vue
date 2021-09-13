@@ -18,6 +18,7 @@
         <div v-show="error" class="error">{{this.errorMsg}}</div>
       </div>
       <router-link class="forget-password" :to="{name: 'ForgotPassword'}">Forget your password?</router-link>
+      <!-- Prevent page jump -->
       <button @click.prevent="signIn">Sign In</button>
       <div class="angle"></div>
     </form>

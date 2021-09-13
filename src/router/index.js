@@ -128,11 +128,13 @@ const router = new VueRouter({
   routes,
 });
 
+//add | FireBlog behind the title
 router.beforeEach((to, from, next) => {
   document.title = `${to.meta.title} | FireBlog`;
   next();
 });
 
+//Vue Route Guards
 router.beforeEach(async (to, from, next) => {
   let user = firebase.auth().currentUser;
   let admin = null;
@@ -140,11 +142,15 @@ router.beforeEach(async (to, from, next) => {
     let token = await user.getIdTokenResult();
     admin = token.claims.admin;
   }
+  // To access the route meta data we are setting a constant 
+  //that takes the `to` argument(the route we are navigating to).
+  //Wherther need authentication?
   if (to.matched.some((res) => res.meta.requireAuth)) {
     if (user) {
+      //Wherther need requireAdmin (Page requires admin rights)
       if (to.matched.some((res) => res.meta.requireAdmin)) {
         if (admin) {
-          return next()
+          return next();
         }
         return next({ name: "Home" });
       }

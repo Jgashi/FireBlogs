@@ -73,17 +73,24 @@ export default {
         this.error = false;
         this.errorMsg = "";
         const firebaseAuth = await firebase.auth();
-        const createUser = await firebaseAuth.createUserWithEmailAndPassword(this.email, this.password);
-        const result = await createUser;
-        const database = db.collection("users").doc(result.user.uid)
-        await database.set({
-          firstName: this.firstName,
-          lastName: this.lastName,
-          username: this.username,
-          email: this.email,
-        })
-        this.$router.push({name: 'Home'})
-        return;
+        try {
+          const createUser = await firebaseAuth.createUserWithEmailAndPassword(this.email, this.password);
+          const result = await createUser;
+          //Get database collection reference by user.uid in collection user
+          const database = db.collection("users").doc(result.user.uid);
+          await database.set({
+            firstName: this.firstName,
+            lastName: this.lastName,
+            username: this.username,
+            email: this.email,
+          })
+          this.$router.push({ name: 'Home' })
+          return;
+        } catch (err) {
+          this.error = true;
+          this.errorMsg = err.message;
+          return
+        }
       }
       this.error = true;
       this.errorMsg = "Please fill out all the fields";

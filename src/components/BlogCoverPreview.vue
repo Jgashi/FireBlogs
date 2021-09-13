@@ -42,10 +42,14 @@ export default {
     position: relative;
     border-radius: 12px;
     background-color: #fff;
-    height: 400px;
-    width: 600px;
-    padding: 50px;
+    width: 80%;
+    padding: 40px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    @media (min-width: 768px) {
+      width: 600px;
+      height: 400px;
+    }
     .icon {
       width: 24px;
       height: auto;
@@ -57,10 +61,10 @@ export default {
       color: #303030;
     }
     img {
-      margin-top: 16px;
       display: block;
       width: auto;
       height: 100%;
+      overflow: hidden;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
   }
