@@ -88,9 +88,9 @@ export default {
 
       .content-preview {
         font-size: 13px;
-        max-height: 24px;
+        max-height: 130px;
         width: 250px;
-        word-spacing: nowrap;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -101,10 +101,9 @@ export default {
         margin-top: 32px;
         padding-bottom: 4px;
         border-bottom: 1px solid transparent;
-        transition: .5s ease-in all;
-
+        transition: 0.3zs ease-in all;
         &:hover {
-          border-bottom: #303030;
+          border-bottom-color: #303030;
         }
       }
 

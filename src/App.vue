@@ -2,7 +2,10 @@
   <div class="app-wrapper">
     <div class="app" v-if="$store.state.postLoaded">
       <Nevigation v-if="navigation" />
-      <router-view />
+      <keep-alive>
+          <router-view v-if="$route.meta.keepAlive"/>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"/>
       <Footer v-if="navigation" />
     </div>
   </div>
@@ -52,7 +55,6 @@ export default {
   },
 };
 </script>
-
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
 

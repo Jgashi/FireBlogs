@@ -1,6 +1,6 @@
 <template>
   <div class="post-view">
-    <div class="container quillWrapper">
+    <div class="container quillWrapper ql-snow">
       <h2>{{ this.blogTitle }}</h2>
       <img :src="blogCoverPhoto" alt="" />
       <div class="post-content ql-editor" v-html="blogHTML"></div>

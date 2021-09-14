@@ -178,6 +178,14 @@ export default {
         this.$store.commit("newBlogPost", payload);
       }
     },
+  },
+  beforeRouteLeave (to, from, next) {
+    if(to.name === 'BlogPreview') {
+      from.meta.keepAlive = true;
+      next();
+    }
+    from.meta.keepAlive = false;
+    next();
   }
 }
 </script>

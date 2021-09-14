@@ -119,6 +119,7 @@ const routes = [
       title: "Edit Blog Post",
       requireAuth: true,
       requireAdmin: true,
+      keepAlive: false
     }
   },
 ];
