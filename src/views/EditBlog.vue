@@ -182,7 +182,9 @@ export default {
   beforeRouteLeave (to, from, next) {
     if(to.name === 'BlogPreview') {
       from.meta.keepAlive = true;
+      console.log(1);
       next();
+      return
     }
     from.meta.keepAlive = false;
     next();

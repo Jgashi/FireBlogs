@@ -59,6 +59,12 @@ export default {
     BlogCoverPreview,
     Loading,
   },
+  async mounted() {
+    this.$store.state.blogHTML = "write your blog title here...";
+    this.$store.state.blogTitle = "";
+    this.$store.state.blogPhotoName = "";
+    this.$store.state.blogPhotoFileURL = null;
+  },
   methods: {
     fileChange() {
       this.file = this.$refs.blogPhoto.files[0];
@@ -108,8 +114,8 @@ export default {
           //Completion observer, called on successful completion
           docRef.put(this.file).on(
             "state_changed",
-            () => {
-              // console.log(snapshot);
+            (snapshot) => {
+              console.log(snapshot);
             },
             (err) => {
               this.error = true;
@@ -178,6 +184,15 @@ export default {
         this.$store.commit("newBlogPost", payload);
       }
     },
+  },
+  beforeRoute (to, from, next) {
+    if(from.name === 'BlogPreview') {
+      to.meta.keepAlive = true;
+      next();
+      return
+    }
+    to.meta.keepAlive = false;
+    next();
   }
 }
 </script>

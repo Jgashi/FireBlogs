@@ -89,6 +89,7 @@ const routes = [
       title: "Create Post",
       requireAuth: true,
       requireAdmin: true,
+      keepAlive: true
     }
   },
   {
@@ -119,7 +120,7 @@ const routes = [
       title: "Edit Blog Post",
       requireAuth: true,
       requireAdmin: true,
-      keepAlive: false
+      keepAlive: true
     }
   },
 ];
