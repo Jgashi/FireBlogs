@@ -185,7 +185,7 @@ export default {
       }
     },
   },
-  beforeRoute (to, from, next) {
+  beforeRouteEnter (to, from, next) {
     if(from.name === 'BlogPreview') {
       to.meta.keepAlive = true;
       next();
