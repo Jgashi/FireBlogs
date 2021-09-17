@@ -39,7 +39,6 @@ export default {
 <style lang="scss" scoped>
 .admin {
   .container {
-    max-width: 1000px;
     padding: 60px 25px;
     h2 {
       text-align: center;

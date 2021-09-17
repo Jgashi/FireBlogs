@@ -3,15 +3,21 @@
     <BlogCoverPreview v-show="this.$store.state.blogPhotoPreview" />
     <Loading v-show="loading"/>
     <div class="container">
-      <div :class="{invisible: !error}" class="err-message">
-        <p><span>Error:</span>{{ this.errorMsg }}</p>
-      </div>
       <div class="blog-info">
         <input type="text" placeholder="Enter Blog Title" v-model="blogTitle">
         <div class="upload-file">
-          <label for="blog-photo">Upload Cover Photo</label>
+          <label for="blog-photo"> {{ this.up }} 
+            <div class="icon">
+              <Upload class="upload"/>
+            </div>
+          </label>
           <input type="file" ref="blogPhoto" id="blog-photo" @change="fileChange" accept=".png, .jpg, jpeg">
-          <button class="preview" @click="openPreview" :class="{ 'button-inactive': !this.$store.state.blogPhotoFileURL }">Preview Photo</button>
+          
+          <button class="preview" @click="openPreview" :class="{ 'button-inactive': !this.$store.state.blogPhotoFileURL }"> {{ this.pre }}
+            <div class="icon">
+              <ImagePic class="image" />
+            </div>
+          </button>
           <span>File Chosen: {{ this.$store.state.blogPhotoName }}</span>
         </div>
       </div>
@@ -22,11 +28,16 @@
         <button @click="uploadBlog">Publish Blog</button>
         <router-link class="router-button" :to="{ name : 'BlogPreview' }">Post Preview</router-link>
       </div>
+      <div :class="{invisible: !error}" class="err-message">
+        <p><span>Error:</span>{{ this.errorMsg }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Upload from "../assets/Icons/upload.svg";
+import ImagePic from "../assets/Icons/image.svg"
 import firebase from "firebase/app";
 import "firebase/storage";
 import db from "../firebase/firebaseInit";
@@ -37,8 +48,8 @@ window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
 import { ImageDrop } from 'quill-image-drop-module'
 //Register the custom modules with Quill
-Quill.register("modules/imageResize", ImageResize);
 Quill.register("modules/imageDrop", ImageDrop);
+Quill.register("modules/imageResize", ImageResize);
 export default {
   name: "CreatePost",
   data() {
@@ -47,6 +58,9 @@ export default {
       error: null,
       errorMsg: null,
       loading: null,
+      windowWidth: null,
+      up: "",
+      pre: "",
       editorSettings: {
         modules: {
           imageDrop: true,
@@ -55,9 +69,15 @@ export default {
       }
     }
   },
+  created() {
+    window.addEventListener('resize', this.checkScreem);
+    this.checkScreem();
+  },
   components: {
     BlogCoverPreview,
     Loading,
+    Upload,
+    ImagePic
   },
   async mounted() {
     this.$store.state.blogHTML = "write your blog title here...";
@@ -66,6 +86,17 @@ export default {
     this.$store.state.blogPhotoFileURL = null;
   },
   methods: {
+    checkScreem() {
+      this.windowWidth = window.innerWidth;
+      if (this.windowWidth <= 900) {
+        this.up = "";
+        this.pre = "";
+        return;
+      }
+      this.up = "Upload Cover Photo";
+      this.pre = "Preview Photo";
+      return;
+    },
     fileChange() {
       this.file = this.$refs.blogPhoto.files[0];
       const fileName = this.file.name;
@@ -223,14 +254,19 @@ export default {
     transition: .5s ease-in-out all;
 
     &:hover {
-      background-color: rgba(48, 48, 48, .7);
+      @media (min-width: 900px) {
+        background-color: rgba(48, 48, 48, .7);
+      }
     }
   }
 
   .container {
     position: relative;
     height: 100%;
-    padding: 10px 25px 60px;
+    padding: 16px 25px 10px;
+    @media (min-width: 900px) {
+      padding: 16px 25px 60px;
+    }
   }
 
 // error styling
@@ -243,11 +279,10 @@ export default {
     padding: 12px;
     border-radius: 8px;
     color: #fff;
-    margin-bottom: 10px;
+    margin-top: 10px;
     background-color: #303030;
     opacity: 1;
     transition: .5s ease all;
-
     p {
       font-size: 14px;
     }
@@ -260,15 +295,16 @@ export default {
   .blog-info {
     display: flex;
     flex-wrap: wrap;
+    margin-top: 16px;
     margin-bottom: 16px;
     @media (min-width: 900px) {
       margin-bottom: 32px;
     }
 
     input:nth-child(1) {
-      min-width: 250px;
+      min-width:280px;
       @media (min-width: 900px) {
-        min-width: 300px;
+        min-width: 350px;
       }
     }
 
@@ -292,7 +328,9 @@ export default {
       label {
         margin-top: 16px;
         flex: 0 2 auto;
+        background-color: #fff;
         @media (min-width: 900px) {
+          background-color: #303030;
           margin-left: 16px;
           margin-top: 0;
         }
@@ -305,7 +343,10 @@ export default {
         text-transform: initial;
         margin-top: 16px;
         flex: 0 1 auto;
+        background-color: #fff;
         @media (min-width: 900px) {
+          display: block;
+          background-color: #303030 ;
           margin-left: 16px;
           margin-top: unset;
         }
@@ -321,13 +362,30 @@ export default {
           margin-top: unset;
         }
       }
+
+      .icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        transition: .5s ease all;
+        @media (min-width: 900px) {
+          display: none;
+        }
+      }
     }  
   }
 
   .enditor {
+    width: 100%;
     height: 80vh;
     display: flex;
     flex-direction: column;
+    @media (min-width: 900px) {
+      width: 90%;
+    }
     .quillWrapper {
       position: relative;
       display: flex;
@@ -350,7 +408,9 @@ export default {
   .blog-actions {
     margin-top: 32px;
     display: flex;
-
+    @media (mix-width: 900px) {
+      margin-top: 16px;
+    }
     button {
       margin-right: 16px;
     }

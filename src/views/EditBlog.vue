@@ -4,15 +4,21 @@
       <BlogCoverPreview v-show="this.$store.state.blogPhotoPreview" />
       <Loading v-show="loading"/>
       <div class="container">
-        <div :class="{invisible: !error}" class="err-message">
-          <p><span>Error:</span>{{ this.errorMsg }}</p>
-        </div>
         <div class="blog-info">
           <input type="text" placeholder="Enter Blog Title" v-model="blogTitle">
           <div class="upload-file">
-            <label for="blog-photo">Upload Cover Photo</label>
+            <label for="blog-photo"> {{ this.up }} 
+              <div class="icon">
+                <Upload class="upload"/>
+              </div>
+            </label>
             <input type="file" ref="blogPhoto" id="blog-photo" @change="fileChange" accept=".png, .jpg, jpeg">
-            <button class="preview" @click="openPreview" :class="{ 'button-inactive': !this.$store.state.blogPhotoFileURL }">Preview Photo</button>
+            
+            <button class="preview" @click="openPreview" :class="{ 'button-inactive': !this.$store.state.blogPhotoFileURL }"> {{ this.pre }}
+              <div class="icon">
+                <ImagePic class="image" />
+              </div>
+            </button>
             <span>File Chosen: {{ this.$store.state.blogPhotoName }}</span>
           </div>
         </div>
@@ -23,12 +29,17 @@
           <button @click="updateBlog">Save Change</button>
           <router-link class="router-button" :to="{name : 'BlogPreview'}">Post Changes</router-link>
         </div>
+        <div :class="{invisible: !error}" class="err-message">
+          <p><span>Error:</span>{{ this.errorMsg }}</p>
+        </div>
       </div>
     </div>
   </keep-alive>
 </template>
 
 <script>
+import Upload from "../assets/Icons/upload.svg";
+import ImagePic from "../assets/Icons/image.svg"
 import firebase from "firebase/app";
 import "firebase/storage";
 import db from "../firebase/firebaseInit";
@@ -37,6 +48,9 @@ import Quill from "quill";
 import Loading from '../components/Loading.vue';
 window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
+import { ImageDrop } from 'quill-image-drop-module'
+//Register the custom modules with Quill
+Quill.register("modules/imageDrop", ImageDrop);
 Quill.register("modules/imageResize", ImageResize);
 export default {
   name: "EditBlog",
@@ -48,16 +62,26 @@ export default {
       loading: null,
       routeID: null,
       currentBlog: null,
+      windowWidth: null,
+      up: "",
+      pre: "",
       editorSettings: {
         modules: {
+          imageDrop: true,
           imageResize: {},
         }
       }
     }
   },
+  created() {
+    window.addEventListener('resize', this.checkScreem);
+    this.checkScreem();
+  },
   components: {
     BlogCoverPreview,
-    Loading
+    Loading,
+    Upload,
+    ImagePic
   },
   async mounted() {
     //Get routeID from dynamic path
@@ -69,6 +93,17 @@ export default {
     this.$store.commit('setBlogState', this.currentBlog[0]);
   },
   methods: {
+    checkScreem() {
+      this.windowWidth = window.innerWidth;
+      if (this.windowWidth <= 900) {
+        this.up = "";
+        this.pre = "";
+        return;
+      }
+      this.up = "Upload Cover Photo";
+      this.pre = "Preview Photo";
+      return;
+    },
     fileChange() {
       this.file = this.$refs.blogPhoto.files[0];
       const fileName = this.file.name;
@@ -85,8 +120,7 @@ export default {
       const docRef = storageRef.child(`documents/blogPostPhotos/${file.name}`)
       docRef.put(file).on(
         "state_changed",
-        (snapshot) => {
-          console.log(snapshot);
+        () => {
         },
         (err) => {
           console.log(err)
@@ -179,14 +213,13 @@ export default {
       }
     },
   },
-  beforeRouteLeave (to, from, next) {
-    if(to.name === 'BlogPreview') {
-      from.meta.keepAlive = true;
-      console.log(1);
+  beforeRouteEnter (to, from, next) {
+    if(from.name === 'BlogPreview') {
+      to.meta.keepAlive = true;
       next();
       return
     }
-    from.meta.keepAlive = false;
+    to.meta.keepAlive = false;
     next();
   }
 }

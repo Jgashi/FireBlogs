@@ -88,7 +88,7 @@ const routes = [
     meta: {
       title: "Create Post",
       requireAuth: true,
-      requireAdmin: true,
+      // requireAdmin: true,
       keepAlive: true
     }
   },
