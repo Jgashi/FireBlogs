@@ -89,8 +89,6 @@ export default {
 
 <style lang="scss" scoped>
 .profile {
-  max-width: 1000px;
-  // padding: 60px 25px;
   h2 {
     text-align: center;
     margin-bottom: 16px;

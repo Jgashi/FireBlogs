@@ -101,6 +101,17 @@ export default {
   }
 }
 
+pre.ql-syntax {
+  background-color: #23241f; 
+  color: #f8f8f2; 
+  overflow: visible;
+  white-space: pre-wrap; 
+  margin-bottom: 5px; 
+  margin-top: 5px; padding: 
+  5px 10px;
+}
+
+
 button,
 .router-button {
   transition: 500ms ease all;

@@ -216,13 +216,13 @@ export default {
       }
     },
   },
-  beforeRouteEnter (to, from, next) {
-    if(from.name === 'BlogPreview') {
-      to.meta.keepAlive = true;
+  beforeRouteLeave (to, from, next) {
+    if(to.name === 'BlogPreview') {
+      from.meta.keepAlive = true;
       next();
       return
     }
-    to.meta.keepAlive = false;
+    from.meta.keepAlive = false;
     next();
   }
 }
